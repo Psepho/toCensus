@@ -1,0 +1,5 @@
+.Rproj.user
+.Rhistory
+.RData
+data-raw/*.csv
+to_voters.csv

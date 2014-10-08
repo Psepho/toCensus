@@ -1,0 +1,12 @@
+toCensus
+========
+
+The census contains a wealth of data, but is awkwardly structured. This package pulls out useful pieces and simulates people in the Toronto CMA.
+
+## Installation
+
+    library(devtools)
+    devtools::install_github("mroutley/toCensus")
+    library(toCensus)
+    data(toVotes)
+    

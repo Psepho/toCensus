@@ -1,0 +1,12 @@
+Package: toCensus
+Title: Useful extracts of the 2010 Census for Toronto
+Version: 0.1
+Authors@R: "Matthew Routley <matt@routleynet.org> [aut, cre]"
+Description: The census contains a wealth of data, but is awkwardly structured.
+  This package pulls out useful pieces and simulates people.
+Depends: R (>= 3.1.1)
+License: None
+LazyData: true
+Suggests: toVotes (>= 0.1),
+    dplyr (>= 0.2),
+    reshape2 (>= 1.4)
