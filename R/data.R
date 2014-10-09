@@ -1,4 +1,4 @@
-#' Data from the 2010 Census for Toronto.
+#' Data from the 2011 Census for Toronto.
 #'
 #' Cleaned and filtered Census data for the Toronto CMA.
 #'
@@ -13,4 +13,23 @@
 #' @format A data frame with 4367115 rows and 4 variables
 #' @source Statistics Canada
 #' @name voters
+NULL
+#' Geocode data for 2011 census tracts.
+#'
+#' Geocoded census tract data filtered to the Toronto CMA.
+#'
+#' \itemize{
+#'   \item long
+#'   \item lat
+#'   \item order
+#'   \item hole
+#'   \item piece
+#'   \item group
+#'   \item Geo_Code. The census tract ID
+#'   ...
+#' }
+#'
+#' @format A data frame with 171578 rows and 7 variables
+#' @source Statistics Canada
+#' @name ct_geo
 NULL

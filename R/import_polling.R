@@ -11,6 +11,6 @@ import_polling <- function() {
   names(polling) <- c("gender", "age_range", "region", "income_range", "Tory", "Ford", "Chow", "Engagement")
   polling <- transform(polling, gender = as.factor(gender), income_range = as.factor(income_range), age_range = as.factor(age_range))
   polling <- dplyr::group_by(polling, gender, age_range, income_range)
-  polling <- dplyr::summarise_each(polling, dplyr::funs(mean))
+  polling <- dplyr::summarise(polling, Tory = mean(Tory), Ford = mean(Ford), Chow = mean(Chow), Engagement = mean(Engagement))
   polling
 }
