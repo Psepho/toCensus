@@ -1,7 +1,13 @@
+library(toCensus)
 polling <- import_polling()
 agents <- to_voters(voters, 10000)
 agents <- dplyr::left_join(agents, polling)
-geo_agents <- dplyr::inner_join(ct_geo, agents)
+
+library(dplyr)
+summary_agents <- agents %>%
+  group_by(Geo_Code) %>%
+  summarize(Engagement=mean(Engagement))
+geo_agents <- dplyr::inner_join(ct_geo, summary_agents)
 
 library(ggmap)
 library(mapproj)
