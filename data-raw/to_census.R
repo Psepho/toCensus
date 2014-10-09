@@ -17,8 +17,6 @@ to_voters <- function() {
   rm(toronto_census_file, census_df)
   pattern <-"^\\s+"
   levels(toronto_census$Characteristic) <- gsub(pattern, "", levels(toronto_census$Characteristic), perl = TRUE)
-  #pattern <- "\\s+(\\d{1,2}\\sto)?\\s(\\d{1,2})\\syears(\\sand\\sover)?" # replace age ranges with end of range
-  #levels(toronto_census$Characteristic) <- gsub(pattern, "\\2", levels(toronto_census$Characteristic), perl = TRUE)
   levels(toronto_census$Characteristic)[23:25] <- c("children", "age", "population")
 
   #nhs_file <- "http://www12.statcan.gc.ca/nhs-enm/2011/dp-pd/prof/details/download-telecharger/comprehensive/comp-csv-tab-nhs-enm.cfm?Lang=E"
@@ -47,5 +45,10 @@ to_voters <- function() {
   names(toronto_income)[2] <- "family_income"
   voters <- droplevels(dplyr::filter(age_gender_expanded, age %in% levels(age_gender_expanded$age)[c(4:5,8:13,15:22)]))
   voters <- dplyr::inner_join(voters, toronto_income)
+  voters$income_range <- cut(voters$family_income, breaks = c(seq(from = 0, to = 10, by = 2),24,100)*10000, labels = c("<$20k","$20k-$40k","$40k-$60k","$60k-$80k","$80k-$100k","$100k-$250k","$250k+"), ordered_result = TRUE)
+  pattern <- "^(\\d{1,2}\\sto\\s)?(\\d{1,2})\\syears(\\sand\\sover)?" # replace age ranges with end of range
+  levels(voters$age) <- gsub(pattern, "\\2", levels(voters$age), perl = TRUE)
+  voters$age <- as.numeric(levels(voters$age))[voters$age]
+  voters$age_range <- cut(voters$age, breaks = c(17, seq(from = 34, to = 64, by = 10), 100), labels = c("18-34", "35-44", "45-54", "55-64", "65+"), ordered_result = TRUE)
   save(voters, file = "data/toVoters.RData")
 }
