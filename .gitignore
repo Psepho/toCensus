@@ -3,4 +3,6 @@
 .RData
 data-raw/*.csv
 data-raw/*.xls*
+data-raw/gct*
+*Temp*
 to_voters.csv
