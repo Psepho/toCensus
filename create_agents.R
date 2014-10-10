@@ -1,6 +1,6 @@
 library(toCensus)
 polling <- import_polling()
-agents <- to_voters(voters, 10000)
+agents <- to_voters(voters, 100000)
 agents <- dplyr::left_join(agents, polling)
 
 library(dplyr)
@@ -11,19 +11,17 @@ geo_agents <- dplyr::inner_join(ct_geo, summary_agents)
 
 library(ggmap)
 library(mapproj)
-toronto_map <- qmap("queens park,toronto", zoom = 11, maptype = 'terrain')
+toronto_map <- qmap("queens park,toronto", zoom = 10, maptype = 'terrain')
 toronto_map +
-  geom_polygon(aes(x=long, y=lat, group=group, fill=Engagement), alpha = 5/6, data=geo_agents) +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=(1-Engagement)), alpha = 4/6, data=geo_agents) +
   scale_colour_brewer("Engagement")
 
-
-
-library(sp)
-library(rgdal)
-map <- readOGR(dsn = "data-raw", "gct_000a11a_e")
-map@proj4string
-
-map.2 <- spTransform(map, CRS("+proj=longlat
-+datum=WGS84"))
-map.2@proj4string
-
+# library(sp)
+# library(rgdal)
+# map <- readOGR(dsn = "data-raw", "gct_000b11a_e")
+# map@proj4string
+# map.2 <- spTransform(map, CRS("+proj=longlat
+# +datum=WGS84"))
+# map.2@proj4string
+# mapdata <- ct_geo@data
+# mapdata <- filter(mapdata, CMANAME == "Toronto")
