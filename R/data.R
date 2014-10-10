@@ -33,3 +33,9 @@ NULL
 #' @source Statistics Canada
 #' @name ct_geo
 NULL
+#' Census tracts in Toronto.
+#'
+#' @format A data frame with 542 rows and 1 variables
+#' @source Statistics Canada
+#' @name toronto_cts
+NULL

@@ -14,6 +14,8 @@ to_voters <- function() {
   characteristics_of_interest <- c("Median age of the population", "Average number of children at home per census family", "Total population by age groups","   0 to 4 years","   5 to 9 years","   10 to 14 years","      15 years","      16 years","      17 years","      18 years","      19 years","   20 to 24 years","   25 to 29 years","   30 to 34 years","   35 to 39 years","   40 to 44 years","   45 to 49 years","   50 to 54 years","   55 to 59 years","   60 to 64 years","   65 to 69 years","   70 to 74 years","   75 to 79 years","   80 to 84 years","   85 years and over")
   toronto_census <- dplyr::filter(toronto_census, Characteristic %in% characteristics_of_interest)
   toronto_census <- droplevels(toronto_census)
+#   toronto_census$Geo_Code <- sprintf("%.2f", as.numeric(toronto_census$Geo_Code))
+  toronto_census$Geo_Code <- as.character(toronto_census$Geo_Code)
   rm(toronto_census_file, census_df)
   pattern <-"^\\s+"
   levels(toronto_census$Characteristic) <- gsub(pattern, "", levels(toronto_census$Characteristic), perl = TRUE)
@@ -27,6 +29,8 @@ to_voters <- function() {
   toronto_nhs <- dplyr::select(toronto_nhs, Geo_Code, Characteristic, Total, Male, Female)
   characteristics_of_interest <- c("  Median family income ($)", "  Postsecondary certificate, diploma or degree", "Employment rate", "  Median income ($)")
   toronto_nhs <- dplyr::filter(toronto_nhs, Characteristic %in% characteristics_of_interest)
+#   toronto_nhs$Geo_Code <- sprintf("%.2f", as.numeric(toronto_nhs$Geo_Code))
+  toronto_nhs$Geo_Code <- as.character(toronto_nhs$Geo_Code)
   rm(on_nhs_df, nhs_file)
   toronto_census <- rbind(toronto_census, toronto_nhs)
   rm(toronto_nhs)
@@ -50,5 +54,6 @@ to_voters <- function() {
   levels(voters$age) <- gsub(pattern, "\\2", levels(voters$age), perl = TRUE)
   voters$age <- as.numeric(levels(voters$age))[voters$age]
   voters$age_range <- cut(voters$age, breaks = c(17, seq(from = 34, to = 64, by = 10), 100), labels = c("18-34", "35-44", "45-54", "55-64", "65+"), ordered_result = TRUE)
+  voters <- dplyr::left_join(toronto_cts, voters)
   save(voters, file = "data/toVoters.RData")
 }

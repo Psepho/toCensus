@@ -11,5 +11,8 @@ geocodeCTs <- function() {
   ct_geo <- transform(ct_geo, id = as.numeric(id))
   names(ct_geo)[7] <- "Geo_Code"
   ct_geo <- dplyr::filter(ct_geo, grepl('^5350', Geo_Code))
+#   ct_geo$Geo_Code <- sprintf("%.2f", as.numeric(ct_geo$Geo_Code))
+  ct_geo$Geo_Code <- as.character(ct_geo$Geo_Code)
+  ct_geo <- dplyr::left_join(toronto_cts, ct_geo)
   save(ct_geo, file = "data/ctGEO.RData")
 }
