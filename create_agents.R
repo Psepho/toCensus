@@ -1,19 +1,32 @@
 library(toCensus)
+library(dplyr)
+library(reshape2)
 polling <- import_polling()
 agents <- to_voters(voters, 10000)
 agents <- dplyr::left_join(agents, polling)
+agents <- agents %>%
+  select(Geo_Code, Tory:Engagement)
+melted <- melt(agents)
 
-library(dplyr)
-summary_agents <- agents %>%
-  group_by(Geo_Code) %>%
-  summarize(Engagement=mean(Engagement))
-geo_agents <- dplyr::left_join(ct_geo, agents)
+summary_agents <- melted %>%
+  group_by(Geo_Code, variable) %>%
+  summarise(value = mean(value))
+geo_agents <- dplyr::left_join(ct_geo, summary_agents)
+
+engagement <- geo_agents %>%
+  filter(variable == "Engagement")
+support <- geo_agents %>%
+  filter(variable != "Engagement")
 
 library(ggmap)
 library(mapproj)
 toronto_map <- qmap("queens park,toronto", zoom = 11, maptype = 'terrain')
-#toronto_map <- qmap("dupont and avenue, toronto", zoom = 11, maptype = 'terrain')
 
 toronto_map +
-  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(Engagement, n=3)), alpha = 4/6, data=geo_agents) +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(value, n=3)), alpha = 4/6, data=engagement) +
   scale_fill_brewer("Engagement", labels=c("Low", "Medium", "High"), palette = "OrRd")
+
+toronto_map +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(value, n=3)), alpha = 4/6, data=support) +
+  scale_fill_brewer("Support", labels=c("Low", "Medium", "High"), palette = "OrRd") +
+  facet_wrap(~variable)
