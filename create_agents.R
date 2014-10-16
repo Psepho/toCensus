@@ -20,13 +20,13 @@ support <- geo_agents %>%
 
 library(ggmap)
 library(mapproj)
-toronto_map <- qmap("queens park,toronto", zoom = 11, maptype = 'terrain')
+toronto_map <- qmap("queens park,toronto", zoom = 11, color = "bw", maptype = 'terrain', extent = 'device', legend = "bottomright", source = "google")
 
 toronto_map +
   geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(value, n=3)), alpha = 4/6, data=engagement) +
   scale_fill_brewer("Engagement", labels=c("Low", "Medium", "High"), palette = "OrRd")
 
 toronto_map +
-  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(value, n=3)), alpha = 4/6, data=support) +
-  scale_fill_brewer("Support", labels=c("Low", "Medium", "High"), palette = "OrRd") +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(value, n=7)), alpha = 4/6, data=support) +
+  scale_fill_brewer("Support", labels=c("Low", "", "", "", "", "", "High"), palette = "OrRd") +
   facet_wrap(~variable)
