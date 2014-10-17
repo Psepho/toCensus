@@ -2,7 +2,14 @@ library(toCensus)
 library(dplyr)
 library(reshape2)
 polling <- import_polling()
-agents <- to_voters(voters, 10000)
+agents <- to_voters(voters, 100000)
+
+regions <- ct_geo %>%
+  group_by(Geo_Code, region) %>%
+  select() %>%
+  distinct()
+
+agents <- dplyr::left_join(agents, regions)
 agents <- dplyr::left_join(agents, polling)
 agents <- agents %>%
   select(Geo_Code, Tory:Engagement)
@@ -27,6 +34,6 @@ toronto_map +
   scale_fill_brewer("Engagement", labels=c("Low", "Medium", "High"), palette = "OrRd")
 
 toronto_map +
-  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(value, n=7)), alpha = 4/6, data=support) +
-  scale_fill_brewer("Support", labels=c("Low", "", "", "", "", "", "High"), palette = "OrRd") +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(value, n=5)), alpha = 4/6, data=support) +
+  scale_fill_brewer("Support", labels=c("Low", "", "", "", "High"), palette = "OrRd") +
   facet_wrap(~variable)
