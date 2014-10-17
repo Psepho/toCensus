@@ -1,8 +1,12 @@
 .Rproj.user
 .Rhistory
 .RData
+*Temp*
+to_voters.csv
 data-raw/*.csv
 data-raw/*.xls*
 data-raw/gct*
-*Temp*
-to_voters.csv
+data-raw/VOTING_SUB*
+data-raw/*.pdf
+data-raw/*.zip
+*.png
