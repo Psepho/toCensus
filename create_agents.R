@@ -2,8 +2,20 @@ library(toCensus)
 library(dplyr)
 library(reshape2)
 polling <- import_polling()
-agents <- to_voters(voters, 100000)
+agents <- to_voters(voters, 10)
 
+candidates <- names(agents)[8:10]
+cast_vote <- function(agent, candidates, n = 1) {
+  support <- sample(candidates, n, replace = TRUE, prob = agent[8:10])
+  vote <- ifelse(runif(n) > agent[, 11], 0, 1)
+  data.frame(support = support, vote = vote)
+  vote
+}
+agent[8:10]
+lapply(agents, cast_vote, n = 1)
+do(agents, cast_vote(., candidates))
+
+mutate(agents, vote = cast_vote())
 regions <- ct_geo %>%
   group_by(Geo_Code, region) %>%
   select() %>%
