@@ -7,7 +7,7 @@
 #' @param export. Should the voters be exported to csv
 #' @return A dataframe containing the voters.
 to_voters <- function(df, n = 100, export = FALSE){
-  these_voters <-df[sample(nrow(df),n),]
+  these_voters <- dplyr::sample_n(df, n)
   if (export) {
     write.csv(these_voters, file = "to_voters.csv")
   }

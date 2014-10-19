@@ -8,6 +8,6 @@ Depends: R (>= 3.1.1),
 License: None
 LazyData: true
 Suggests: toVotes (>= 0.1),
-    dplyr (>= 0.2),
     reshape2 (>= 1.4)
-Imports: XLConnect (>= 0.2)
+Imports: dplyr (>= 0.2),
+    XLConnect (>= 0.2)
