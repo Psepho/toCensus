@@ -2,8 +2,8 @@ library(toCensus)
 library(dplyr)
 library(reshape2)
 polling <- import_polling()
-n <- 100000
-sim <- 10
+n <- 1000
+sim <- 5
 agents <- to_voters(voters, n)
 agents$sim <- 1
 for (i in 2:sim) {
@@ -34,15 +34,18 @@ for (i in 1:dim(agents)[1]) {
 
 ct_summary <- agents %>%
   group_by(sim, Geo_Code, support, add = FALSE) %>%
-  summarise(votes = sum(vote))
+  summarise(votes = sum(vote),
+            intent = n())
 ct_summary <- ct_summary %>%
   group_by(Geo_Code, support) %>%
   summarise(votes = mean(votes),
-            error = sd(votes, na.rm = TRUE))
+            intent = mean(intent))
 total_votes <- ct_summary %>%
   group_by(support) %>%
-  summarize(votes = sum(votes))
+  summarize(votes = sum(votes),
+            intent = sum(intent))
 prop.table(tapply(total_votes$votes, total_votes[1], sum))
+total_votes$votes/total_votes$intent
 
 geo_summary <- dplyr::left_join(ct_geo, ct_summary)
 
