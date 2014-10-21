@@ -6,16 +6,15 @@ regions <- ct_geo %>% # To join agents to regions for polling data
   select() %>%
   distinct()
 polling <- import_polling()
-n <- 1000 # Number of voters to sample
-sim <- 5 # Number of iterations to run
+n <- 1000000 # Number of voters to sample
+sim <- 100 # Number of iterations to run
 # Create the agents for each sim
+sims <- rep(1:sim, each = n)
 agents <- to_voters(voters, n)
-agents$sim <- 1
 for (i in 2:sim) {
-  new_agents <- to_voters(voters, n)
-  new_agents$sim <- i
-  agents <- rbind(agents, new_agents)
+  agents <- rbind(agents, to_voters(voters, n))
 }
+agents <- cbind(sims, agents)
 agents <- dplyr::left_join(agents, regions)
 agents <- dplyr::left_join(agents, polling)
 agents <- agents[!is.na(agents$Engagement),]
