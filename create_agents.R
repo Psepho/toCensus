@@ -7,12 +7,12 @@ regions <- ct_geo %>% # To join agents to regions for polling data
   distinct()
 polling <- import_polling()
 n <- 1000000 # Number of voters to sample
-sim <- 10 # Number of iterations to run
+sim <- 100 # Number of iterations to run
 # Create the agents for each sim
 sims <- rep(1:sim, each = n)
 agents <- to_voters(voters, n)
 for (i in 2:sim) {
-  agents <- rbind(agents, to_voters(voters, n))
+  agents <- rbind_list(agents, to_voters(voters, n))
 }
 agents <- data.frame(sim = sims, agents)
 agents <- dplyr::left_join(agents, regions)
@@ -51,4 +51,9 @@ toronto_map <- qmap("queens park,toronto", zoom = 11, color = "bw", maptype = 't
 toronto_map +
   geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(votes, n=5)), alpha = 4/6, data=filter(geo_summary, support != "NA")) +
   scale_fill_brewer("Votes", labels=c("Low", "", "", "", "High"), palette = "OrRd") +
+  facet_wrap(~support)
+
+toronto_map +
+  geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(intent, n=5)), alpha = 4/6, data=filter(geo_summary, support != "NA")) +
+  scale_fill_brewer("Intent", labels=c("Low", "", "", "", "High"), palette = "OrRd") +
   facet_wrap(~support)
