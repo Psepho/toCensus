@@ -1,9 +1,14 @@
 library(toCensus)
 library(dplyr)
 library(reshape2)
+regions <- ct_geo %>% # To join agents to regions for polling data
+  group_by(Geo_Code, region) %>%
+  select() %>%
+  distinct()
 polling <- import_polling()
-n <- 1000
-sim <- 5
+n <- 1000 # Number of voters to sample
+sim <- 5 # Number of iterations to run
+# Create the agents for each sim
 agents <- to_voters(voters, n)
 agents$sim <- 1
 for (i in 2:sim) {
@@ -11,26 +16,17 @@ for (i in 2:sim) {
   new_agents$sim <- i
   agents <- rbind(agents, new_agents)
 }
-
-regions <- ct_geo %>%
-  group_by(Geo_Code, region) %>%
-  select() %>%
-  distinct()
-
 agents <- dplyr::left_join(agents, regions)
 agents <- dplyr::left_join(agents, polling)
 agents <- agents[!is.na(agents$Engagement),]
-
-agents <- agents %>%
+agents <- agents %>% # Drop the demographics, now that we've joined with polls
   select(Geo_Code, sim, Tory, Ford, Chow, Engagement)
-
-candidates <- names(agents)[3:5]
-agents$support <- NA
-agents$vote <- NA
-for (i in 1:dim(agents)[1]) {
-  agents$support[i] <- sample(candidates, 1, replace = TRUE, prob = agents[i, 3:5])
-  agents$vote[i] <- ifelse(runif(1) > agents[i, 6], 0, 1)
+candidates <- names(agents)[3:5] # List to choose from
+agents$vote <- ifelse(runif(n*sim) > agents$Engagement, 0, 1) # Vector indicating if they vote
+cast_vote <- function(agents) {
+  sample(candidates, 1, replace = TRUE, prob=agents[3:5])
 }
+agents$support <- apply(agents, 1, cast_vote) # Each agent casts a vote
 
 ct_summary <- agents %>%
   group_by(sim, Geo_Code, support, add = FALSE) %>%
