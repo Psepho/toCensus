@@ -7,21 +7,21 @@ regions <- ct_geo %>% # To join agents to regions for polling data
   distinct()
 polling <- import_polling()
 n <- 1000000 # Number of voters to sample
-sim <- 100 # Number of iterations to run
+sim <- 10 # Number of iterations to run
 # Create the agents for each sim
 sims <- rep(1:sim, each = n)
 agents <- to_voters(voters, n)
 for (i in 2:sim) {
   agents <- rbind(agents, to_voters(voters, n))
 }
-agents <- cbind(sims, agents)
+agents <- data.frame(sim = sims, agents)
 agents <- dplyr::left_join(agents, regions)
 agents <- dplyr::left_join(agents, polling)
 agents <- agents[!is.na(agents$Engagement),]
 agents <- agents %>% # Drop the demographics, now that we've joined with polls
   select(Geo_Code, sim, Tory, Ford, Chow, Engagement)
 candidates <- names(agents)[3:5] # List to choose from
-agents$vote <- ifelse(runif(n*sim) > agents$Engagement, 0, 1) # Vector indicating if they vote
+agents$vote <- ifelse(runif(dim(agents)[1]) > agents$Engagement, 0, 1) # Vector indicating if they vote
 cast_vote <- function(agents) {
   sample(candidates, 1, replace = TRUE, prob=agents[3:5])
 }
