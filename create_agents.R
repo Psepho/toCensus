@@ -44,6 +44,7 @@ prop.table(tapply(total_votes$votes, total_votes[1], sum))
 total_votes$votes/total_votes$intent
 
 geo_summary <- dplyr::left_join(ct_geo, ct_summary)
+geo_summary <- filter(geo_summary, support != "Other")
 
 library(ggmap)
 library(mapproj)
