@@ -5,9 +5,13 @@ regions <- ct_geo %>% # To join agents to regions for polling data
   group_by(Geo_Code, region) %>%
   select() %>%
   distinct()
+wards <- ct_geo %>% # To join agents to wards for polling data
+  group_by(Geo_Code, ward) %>%
+  select() %>%
+  distinct()
 polling <- import_polling()
 n <- 1000000 # Number of voters to sample
-sim <- 10 # Number of iterations to run
+sim <- 20 # Number of iterations to run
 # Create the agents for each sim
 sims <- rep(1:sim, each = n)
 agents <- to_voters(voters, n)
@@ -33,8 +37,10 @@ ct_summary <- agents %>%
   summarise(votes = sum(vote),
             intent = n())
 ct_summary <- ct_summary %>%
-  group_by(Geo_Code, support) %>%
+  group_by(Geo_Code, support, add = FALSE) %>%
   summarise(votes = mean(votes),
+            se_votes = sd(votes),
+            number = n(),
             intent = mean(intent))
 total_votes <- ct_summary %>%
   group_by(support) %>%
@@ -59,3 +65,15 @@ toronto_map +
   geom_polygon(aes(x=long, y=lat, group=group, fill=cut_interval(intent, n=5)), alpha = 4/6, data=filter(geo_summary, support != "NA")) +
   scale_fill_brewer("Intent", labels=c("Low", "", "", "", "High"), palette = "OrRd") +
   facet_wrap(~support)
+
+ward_summary <- dplyr::left_join(wards, agents)
+ward_summary <- ward_summary %>%
+  group_by(sim, ward, support, add = FALSE) %>%
+  summarise(votes = sum(vote),
+            intent = n())
+ward_summary <- ward_summary %>%
+  group_by(ward, support, add = FALSE) %>%
+  summarise(vote = mean(votes),
+            se_votes = sd(votes)/20,
+            intention = mean(intent),
+            se_intention = sd(intent)/20)
