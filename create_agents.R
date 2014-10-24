@@ -10,8 +10,8 @@ wards <- ct_geo %>% # To join agents to wards for polling data
   select() %>%
   distinct()
 polling <- import_polling()
-n <- 1000000 # Number of voters to sample
-simulations <- 20 # Number of iterations to run
+n <- 100000 # Number of voters to sample
+simulations <- 15 # Number of iterations to run
 # Create the agents for each sim
 sims <- rep(1:simulations, each = n)
 agents <- to_voters(voters, n)
@@ -19,6 +19,7 @@ for (i in 2:simulations) {
   agents <- rbind_list(agents, to_voters(voters, n))
 }
 agents <- data.frame(sim = sims, agents)
+rm(sims)
 agents <- dplyr::left_join(agents, regions)
 agents <- dplyr::left_join(agents, polling)
 agents <- agents[!is.na(agents$Engagement),]
@@ -76,4 +77,6 @@ ward_summary <- ward_summary %>%
   summarise(vote = mean(votes),
             se_votes = sd(votes)/simulations,
             intention = mean(intent),
-            se_intention = sd(intent)/simulations)
+            se_intention = sd(intent)/simulations,
+            turnout = mean(votes/intent),
+            se_turnout = sd(votes/intent)/simulations)
