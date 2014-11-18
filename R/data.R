@@ -16,7 +16,7 @@
 NULL
 #' Geocode data for 2011 census tracts.
 #'
-#' Geocoded census tract data filtered to the Toronto CMA.
+#' Geocoded census tract data filtered to the City of Toronto.
 #'
 #' \itemize{
 #'   \item long
@@ -26,16 +26,12 @@ NULL
 #'   \item piece
 #'   \item group
 #'   \item Geo_Code. The census tract ID
+#'   \item ward. The city ward for the tract
+#'   \item region. The region of the tract
 #'   ...
 #' }
 #'
-#' @format A data frame with 171578 rows and 7 variables
+#' @format A data frame with 65906 rows and 9 variables
 #' @source Statistics Canada
-#' @name ct_geo
-NULL
-#' Census tracts in Toronto.
-#'
-#' @format A data frame with 542 rows and 1 variables
-#' @source Statistics Canada
-#' @name toronto_cts
+#' @name ct_geo_to
 NULL

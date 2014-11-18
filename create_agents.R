@@ -1,11 +1,11 @@
 library(toCensus)
 library(dplyr)
 library(reshape2)
-regions <- ct_geo %>% # To join agents to regions for polling data
+regions <- ct_geo_to %>% # To join agents to regions for polling data
   group_by(Geo_Code, region) %>%
   select() %>%
   distinct()
-wards <- ct_geo %>% # To join agents to wards for polling data
+wards <- ct_geo_to %>% # To join agents to wards for polling data
   group_by(Geo_Code, ward) %>%
   select() %>%
   distinct()
@@ -50,7 +50,7 @@ total_votes <- ct_summary %>%
 prop.table(tapply(total_votes$votes, total_votes[1], sum))
 total_votes$votes/total_votes$intent
 
-geo_summary <- dplyr::left_join(ct_geo, ct_summary)
+geo_summary <- dplyr::left_join(ct_geo_to, ct_summary)
 geo_summary <- filter(geo_summary, support != "Other")
 
 library(ggmap)
