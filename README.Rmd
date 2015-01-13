@@ -6,7 +6,7 @@ The census contains a wealth of data, but is awkwardly structured. This package 
 ## Installation
 
     library(devtools)
-    devtools::install_github("mroutley/toCensus")
+    devtools::install_github("Psepho/toCensus")
     library(toCensus)
     data(toVotes)
     
