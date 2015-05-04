@@ -1,6 +1,6 @@
 doc2 <- xml2::read_xml("data-raw/census.xml")
 ns <- xml2::xml_ns(doc2)
-to_nodes <- "//*[@concept = 'GEO' and @value = '35535']/../.."
+to_nodes <- "//d1:GenericData/d1:DataSet/generic:Series/generic:SeriesKey/*[@concept = 'GEO' and @value = '35535']/../.."
 years <- as.integer(xml2::xml_text(xml2::xml_find_all(doc2, stringr::str_c(to_nodes, "/generic:Obs/generic:Time"), ns)))
 values <- as.integer(xml2::xml_attr(xml2::xml_find_all(doc2, stringr::str_c(to_nodes, "/generic:Obs//*[@value]"), ns), "value"))
 labels <- as.integer(xml2::xml_attr(xml2::xml_find_all(doc2, stringr::str_c(to_nodes, "/generic:SeriesKey/generic:Value"), ns), "value"))
