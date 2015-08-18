@@ -8,5 +8,5 @@ The census contains a wealth of data, but is awkwardly structured. This package 
     library(devtools)
     devtools::install_github("Psepho/toCensus")
     library(toCensus)
-    data(toVotes)
+    data(toCensus)
     

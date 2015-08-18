@@ -3,7 +3,7 @@
 #' Creates individual agents ("Torontonians") based on census data
 #'
 #' @return A dataframe containing all agents of voting age.
-to_voters <- function() {
+to_census <- function() {
   # 2010 Census data
   # census_file <- "http://www12.statcan.gc.ca/census-recensement/2011/dp-pd/prof/details/download-telecharger/comprehensive/comp_download.cfm?CTLG=98-316-XWE2011001&FMT=CSV401&Lang=E&Tab=1&Geo1=CSD&Code1=3520005&Geo2=CD&Code2=3520&Data=Count&SearchText=toronto&SearchType=Begins&SearchPR=01&B1=All&Custom=&TABID=1"
   # download.file(census_file, destfile = "data-raw/98-316-XWE2011001-401_CSV.zip")
@@ -47,13 +47,13 @@ to_voters <- function() {
   toronto_income <- dplyr::filter(toronto_census, Characteristic == "family_income")
   toronto_income <- dplyr::select(toronto_income, Geo_Code, Total)
   names(toronto_income)[2] <- "family_income"
-  voters <- droplevels(dplyr::filter(age_gender_expanded, age %in% levels(age_gender_expanded$age)[c(4:5,8:13,15:22)]))
-  voters <- dplyr::inner_join(voters, toronto_income)
-  voters$income_range <- cut(voters$family_income, breaks = c(seq(from = 0, to = 10, by = 2),24,100)*10000, labels = c("<$20k","$20k-$40k","$40k-$60k","$60k-$80k","$80k-$100k","$100k-$250k","$250k+"), ordered_result = TRUE)
+  census <- droplevels(dplyr::filter(age_gender_expanded, age %in% levels(age_gender_expanded$age)[c(4:5,8:13,15:22)]))
+  census <- dplyr::inner_join(census, toronto_income)
+  census$income_range <- cut(census$family_income, breaks = c(seq(from = 0, to = 10, by = 2),24,100)*10000, labels = c("<$20k","$20k-$40k","$40k-$60k","$60k-$80k","$80k-$100k","$100k-$250k","$250k+"), ordered_result = TRUE)
   pattern <- "^(\\d{1,2}\\sto\\s)?(\\d{1,2})\\syears(\\sand\\sover)?" # replace age ranges with end of range
-  levels(voters$age) <- gsub(pattern, "\\2", levels(voters$age), perl = TRUE)
-  voters$age <- as.numeric(levels(voters$age))[voters$age]
-  voters$age_range <- cut(voters$age, breaks = c(17, seq(from = 34, to = 64, by = 10), 100), labels = c("18-34", "35-44", "45-54", "55-64", "65+"), ordered_result = TRUE)
-  voters <- dplyr::left_join(toronto_cts, voters)
-  save(voters, file = "data/toVoters.RData")
+  levels(census$age) <- gsub(pattern, "\\2", levels(census$age), perl = TRUE)
+  census$age <- as.numeric(levels(census$age))[census$age]
+  census$age_range <- cut(census$age, breaks = c(17, seq(from = 34, to = 64, by = 10), 100), labels = c("18-34", "35-44", "45-54", "55-64", "65+"), ordered_result = TRUE)
+  toCensus <- dplyr::left_join(toronto_cts, census)
+  save(toCensus, file = "data/toCensus.RData")
 }
