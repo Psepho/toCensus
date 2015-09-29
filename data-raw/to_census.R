@@ -29,7 +29,6 @@ to_census <- function() {
   toronto_nhs <- dplyr::select(toronto_nhs, Geo_Code, Characteristic, Total, Male, Female)
   characteristics_of_interest <- c("  Median family income ($)", "  Postsecondary certificate, diploma or degree", "Employment rate", "  Median income ($)")
   toronto_nhs <- dplyr::filter(toronto_nhs, Characteristic %in% characteristics_of_interest)
-#   toronto_nhs$Geo_Code <- sprintf("%.2f", as.numeric(toronto_nhs$Geo_Code))
   toronto_nhs$Geo_Code <- as.character(toronto_nhs$Geo_Code)
   rm(on_nhs_df, nhs_file)
   toronto_census <- rbind(toronto_census, toronto_nhs)
@@ -55,5 +54,6 @@ to_census <- function() {
   census$age <- as.numeric(levels(census$age))[census$age]
   census$age_range <- cut(census$age, breaks = c(17, seq(from = 34, to = 64, by = 10), 100), labels = c("18-34", "35-44", "45-54", "55-64", "65+"), ordered_result = TRUE)
   toCensus <- dplyr::left_join(toronto_cts, census)
+  toCensus$Geo_Code <- sprintf("%.2f", as.numeric(toCensus$Geo_Code))
   save(toCensus, file = "data/toCensus.RData")
 }
