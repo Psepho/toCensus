@@ -2,6 +2,8 @@ library(magrittr)
 
 # 2016 Census data -------------------------------------------------------------
 
+# Download files
+
 age_sex_url <- "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=109527&OFT=CSV"
 age_sex_file <- "98-400-X2016005_ENG_CSV.zip"
 income_url <- "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=110193&OFT=CSV"
@@ -18,6 +20,16 @@ download_and_unzip_file <- function(url, file) { # A helper function for downloa
 
 download_and_unzip_file(age_sex_url, age_sex_file)
 download_and_unzip_file(income_url, income_file)
+
+# Process data
+
+census_df <- dplyr::tbl_df(readr::read_csv(file = "data-raw/98-400-X2016005_English_CSV_data.csv")) %>%
+  dplyr::filter(stringr::str_sub(`GEO_CODE (POR)`, 1, 3) == "535") %>%
+  dplyr::select(c(1:2, 8, 12:13))
+names(census_df) <- c("year", "geo_code", "age", "male", "female")
+census_df %<>%
+  dplyr::mutate(age = as.integer(age)) %>% # Converts the aggregations into NA
+  dplyr::filter(!is.na(age)) # Filters out the aggregations
 
 
 # 2010 Census data --------------------------------------------------------
