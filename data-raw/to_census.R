@@ -2,7 +2,22 @@ library(magrittr)
 
 # 2016 Census data -------------------------------------------------------------
 
+age_sex_url <- "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=109527&OFT=CSV"
+age_sex_file <- "98-400-X2016005_ENG_CSV.zip"
+income_url <- "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=110193&OFT=CSV"
+income_file <- "98-400-X2016100_ENG_CSV.zip"
 
+download_and_unzip_file <- function(url, file) { # A helper function for downloads and unzipping, since there may be many files
+  if(file.exists(paste0("data-raw/", file))) {
+    # Nothing to do
+  }  else {
+    download.file(url, destfile = paste0("data-raw/", file), mode="wb")
+    unzip(paste0("data-raw/", file), exdir="data-raw")
+  }
+}
+
+download_and_unzip_file(age_sex_url, age_sex_file)
+download_and_unzip_file(income_url, income_file)
 
 
 # 2010 Census data --------------------------------------------------------
@@ -56,4 +71,5 @@ census$age <- as.numeric(levels(census$age))[census$age]
 census$age_range <- cut(census$age, breaks = c(17, seq(from = 34, to = 64, by = 10), 100), labels = c("18-34", "35-44", "45-54", "55-64", "65+"), ordered_result = TRUE)
 toCensus <- dplyr::left_join(toronto_cts, census)
 toCensus$Geo_Code <- sprintf("%.2f", as.numeric(toCensus$Geo_Code))
+toCensus$year <- as.factor(2010)
 save(toCensus, file = "data/toCensus.RData")
