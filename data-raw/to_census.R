@@ -59,9 +59,7 @@ income_df %<>%
 census_df %<>%
   dplyr::left_join(income_df)
 
-# census$income_range <- cut(census$family_income, breaks = c(seq(from = 0, to = 10, by = 2),24,100)*10000, labels = c("<$20k","$20k-$40k","$40k-$60k","$60k-$80k","$80k-$100k","$100k-$250k","$250k+"), ordered_result = TRUE)
-
-
+readr::write_csv(census_df, "to_census_2010.csv")
 
 
 # 2010 Census data --------------------------------------------------------
