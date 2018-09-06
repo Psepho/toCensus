@@ -26,16 +26,48 @@ download_and_unzip_file(income_url, income_file)
 census_df <- dplyr::tbl_df(readr::read_csv(file = "data-raw/98-400-X2016005_English_CSV_data.csv")) %>%
   dplyr::filter(stringr::str_sub(`GEO_CODE (POR)`, 1, 3) == "535") %>%
   dplyr::select(c(1:2, 8, 12:13))
-names(census_df) <- c("year", "geo_code", "age", "male", "female")
+names(census_df) <- c("year", "Geo_Code", "age", "male", "female")
 census_df %<>%
   dplyr::mutate(age = as.integer(age)) %>% # Converts the aggregations into NA
-  dplyr::filter(!is.na(age)) # Filters out the aggregations
+  dplyr::filter(!is.na(age)) %>%  # Filters out the aggregations
+  dplyr::filter(Geo_Code != "535") %>%
+  tidyr::gather(gender, count, -year, -Geo_Code, -age)
+
+census_df <-
+  dplyr::tbl_df(data.frame(
+    age = rep(census_df$age, times = census_df$count),
+    gender = rep(census_df$gender, times =
+                   census_df$count),
+    Geo_Code = rep(census_df$Geo_Code, times =
+                     census_df$count),
+    year = rep(census_df$year, times = census_df$count)
+  ))
+
+income_df <- dplyr::tbl_df(readr::read_csv(file = "data-raw/98-400-X2016100_English_CSV_data.csv")) %>%
+  dplyr::filter(stringr::str_sub(`GEO_CODE (POR)`, 1, 3) == "535") %>%
+  dplyr::select(c(1:2, 8, 12))
+names(income_df) <- c("year", "Geo_Code", "type", "family_income")
+income_df %<>%
+  dplyr::filter(Geo_Code != "535") %>%
+  dplyr::filter(type == "Total - Household type including census family structure") %>%
+  dplyr::select(-type) %>%
+  dplyr::mutate(income_range = cut(family_income,
+                                   breaks = c(seq(from = 0, to = 10, by = 2),24,100)*10000,
+                                   labels = c("<$20k","$20k-$40k","$40k-$60k","$60k-$80k","$80k-$100k","$100k-$250k","$250k+"),
+                                   ordered_result = TRUE))
+
+census_df %<>%
+  dplyr::left_join(income_df)
+
+# census$income_range <- cut(census$family_income, breaks = c(seq(from = 0, to = 10, by = 2),24,100)*10000, labels = c("<$20k","$20k-$40k","$40k-$60k","$60k-$80k","$80k-$100k","$100k-$250k","$250k+"), ordered_result = TRUE)
+
+
 
 
 # 2010 Census data --------------------------------------------------------
-# census_file <- "http://www12.statcan.gc.ca/census-recensement/2011/dp-pd/prof/details/download-telecharger/comprehensive/comp_download.cfm?CTLG=98-316-XWE2011001&FMT=CSV401&Lang=E&Tab=1&Geo1=CSD&Code1=3520005&Geo2=CD&Code2=3520&Data=Count&SearchText=toronto&SearchType=Begins&SearchPR=01&B1=All&Custom=&TABID=1"
-# download.file(census_file, destfile = "data-raw/98-316-XWE2011001-401_CSV.zip")
-# unzip("data-raw/98-316-XWE2011001-401_CSV.zip", exdir="data-raw")
+census_file <- "http://www12.statcan.gc.ca/census-recensement/2011/dp-pd/prof/details/download-telecharger/comprehensive/comp_download.cfm?CTLG=98-316-XWE2011001&FMT=CSV401&Lang=E&Tab=1&Geo1=CSD&Code1=3520005&Geo2=CD&Code2=3520&Data=Count&SearchText=toronto&SearchType=Begins&SearchPR=01&B1=All&Custom=&TABID=1"
+download.file(census_file, destfile = "data-raw/98-316-XWE2011001-401_CSV.zip", mode="wb")
+unzip("data-raw/98-316-XWE2011001-401_CSV.zip", exdir="data-raw")
 census_df <- dplyr::tbl_df(read.csv(file="data-raw/98-316-XWE2011001-401.CSV", skip = 1))
 toronto_census <- dplyr::filter(census_df,CMACA_Name=="Toronto")
 toronto_census <- dplyr::select(toronto_census, Geo_Code, Characteristic, Total, Male, Female)
@@ -49,9 +81,9 @@ pattern <-"^\\s+"
 levels(toronto_census$Characteristic) <- gsub(pattern, "", levels(toronto_census$Characteristic), perl = TRUE)
 levels(toronto_census$Characteristic)[23:25] <- c("children", "age", "population")
 
-#nhs_file <- "http://www12.statcan.gc.ca/nhs-enm/2011/dp-pd/prof/details/download-telecharger/comprehensive/comp-csv-tab-nhs-enm.cfm?Lang=E"
-# download.file(nhs_file, destfile = "data-raw/99-004-XWE2011001-401_CSV.zip")
-# unzip("data-raw/99-004-XWE2011001-401_CSV.zip", exdir="data-raw")
+nhs_file <- "http://www12.statcan.gc.ca/nhs-enm/2011/dp-pd/prof/details/download-telecharger/comprehensive/comp-csv-tab-nhs-enm.cfm?Lang=E"
+download.file(nhs_file, destfile = "data-raw/99-004-XWE2011001-401_CSV.zip", mode="wb")
+unzip("data-raw/99-004-XWE2011001-401_CSV.zip", exdir="data-raw")
 on_nhs_df <- dplyr::tbl_df(read.csv(file="data-raw/99-004-XWE2011001-401-ONT.csv"))
 toronto_nhs <- dplyr::filter(on_nhs_df,CMA_CA_Name=="Toronto")
 toronto_nhs <- dplyr::select(toronto_nhs, Geo_Code, Characteristic, Total, Male, Female)
