@@ -8,6 +8,8 @@ age_sex_url <- "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/
 age_sex_file <- "98-400-X2016005_ENG_CSV.zip"
 income_url <- "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=110193&OFT=CSV"
 income_file <- "98-400-X2016100_ENG_CSV.zip"
+education_url <- "https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/dt-td/CompDataDownload.cfm?LANG=E&PID=110455&OFT=CSV"
+education_file <- "98-400-X2016244_ENG_CSV"
 
 download_and_unzip_file <- function(url, file) { # A helper function for downloads and unzipping, since there may be many files
   if(file.exists(paste0("data-raw/", file))) {
@@ -20,6 +22,7 @@ download_and_unzip_file <- function(url, file) { # A helper function for downloa
 
 download_and_unzip_file(age_sex_url, age_sex_file)
 download_and_unzip_file(income_url, income_file)
+download_and_unzip_file(education_url, education_file)
 
 # Process data
 
@@ -55,6 +58,18 @@ income_df %<>%
                                    breaks = c(seq(from = 0, to = 10, by = 2),24,100)*10000,
                                    labels = c("<$20k","$20k-$40k","$40k-$60k","$60k-$80k","$80k-$100k","$100k-$250k","$250k+"),
                                    ordered_result = TRUE))
+
+education_df <- dplyr::tbl_df(readr::read_csv(file = "data-raw/98-400-X2016244_English_CSV_data.csv")) %>%
+  dplyr::filter(stringr::str_sub(`GEO_CODE (POR)`, 1, 3) == "535",
+                `GEO_CODE (POR)` != "535",
+                `DIM: School attendance (3)` == "Total - School attendance",
+                !`DIM: Age (13A)` %in% c("Total - Age", "15 to 24 years", "25 to 64 years", "25 to 34 years"),
+                `DIM: Sex (3)` != "Total - Sex",
+                `DIM: Highest certificate, diploma or degree (9)` != "Total - Highest certificate, diploma or degree") %>%
+  dplyr::select(c(1:2, 11, 14, 17, 20))
+names(education_df) <- c("year", "Geo_Code", "age", "gender", "education")
+
+readr::write_csv(education_df, "to_census_education.csv")
 
 census_df %<>%
   dplyr::left_join(income_df)
